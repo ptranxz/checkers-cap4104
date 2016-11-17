@@ -1,8 +1,3 @@
-package checkerproject;
-
-
-
-
 import java.awt.*;
 import java.awt.event.*;
 import java.applet.*;
@@ -279,9 +274,9 @@ public void paint(Graphics g)
 			 for (int row = 0; row < 8; row++) {
 			    for (int col = 0; col < 8; col++) {
 			        if ( row % 2 == col % 2 )
-			           g.setColor(Color.lightGray);
+			           g.setColor(new Color(70,70,70));
 			        else
-			           g.setColor(Color.gray);
+			           g.setColor(new Color(255,60,60));
 			        g.fillRect(col*50,row*50, 50, 50);
 			        switch (board.pieceAt(row,col)) {
 			           case CheckersData.RED:
@@ -641,7 +636,3 @@ private boolean canMove(int player, int r1, int c1, int r2, int c2)
 
 
 	}// end class check data
-
-
-
-
