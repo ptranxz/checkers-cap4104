@@ -34,7 +34,7 @@ You can probably use CodeBlocks or another IDE, but these instructions are for E
 4. This creates a file called checker.java. Paste the contents of our project's checkerproject/src/checkerproject/checker.java into this new file.
 5. Run the program
 
-### Adding your changes to Github**
+### Adding your changes to Github
 After finishing each of your tasks, test your changes and make sure the game still works as it did before. If all is well and you don't have any compile/runtime errors (warnings are fine) you can commit your changes to Github.
 
 First, you need to create a Github account (free). Text me your username so I can add you to the project. Once you're added you can commit your code:
