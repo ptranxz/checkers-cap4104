@@ -1,7 +1,11 @@
+package checkerproject;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.applet.*;
 import java.util.Vector;
+import javax.swing.JOptionPane;
+
 
 
 
@@ -19,26 +23,43 @@ public class checker extends Applet
 	
 		// gather all the component
 		 CheckersCanvas board = new CheckersCanvas();
-		 add(board); // create 2 button on the board
+		 add(board); // create 3 button on the board
 		
-		 //Create New gane button
+		 //Create New game button
 		 board.newGameButton.setBackground(Color.lightGray);
 		 add(board.newGameButton);
 	
 		 // create resign button 
 		 board.resignButton.setBackground(Color.lightGray);
 		 add(board.resignButton);
+		 
+		 // create resign button 
+		 board.rulesButton.setBackground(Color.lightGray);
+		 add(board.rulesButton);
 		
 		 // Message for the player
 		 board.message.setForeground(Color.black);
 		 board.message.setFont(new Font("Serif", Font.BOLD, 14));
 		 add(board.message);
 		
+		 // Player One Name
+		 board.playerOneDisplay.setForeground(Color.black);
+		 board.playerOneDisplay.setFont(new Font("Serif", Font.BOLD, 16));
+		 add(board.playerOneDisplay);
+		 
+		 // Player One Name
+		 board.playerTwoDisplay.setForeground(Color.black);
+		 board.playerTwoDisplay.setFont(new Font("Serif", Font.BOLD, 16));
+		 add(board.playerTwoDisplay);
+				 
 		 // bound method location on the board
-		 board.setBounds(20,20,400,400); 
+		 board.setBounds(30, 30, 400, 400); 
 		 board.newGameButton.setBounds(430, 60, 100, 30);
 		 board.resignButton.setBounds(430, 120, 100, 30);
-		 board.message.setBounds(70,420, 330, 30);
+		 board.rulesButton.setBounds(430, 180, 100, 30);
+		 board.message.setBounds(70, 430, 330, 30);
+		 board.playerOneDisplay.setBounds(0, 430, 100, 30);
+		 board.playerTwoDisplay.setBounds(0, 0, 100, 30);
 	}
 
 
@@ -61,7 +82,10 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener
 
 Button resignButton;   // Current player can resign by clicking this button.
 Button newGameButton;  // This button starts a new game.  It is enabled only when the current game has ended.
+Button rulesButton; // This button creates a pop-out with the rules.
 Label message;   // A label for displaying messages to the user.
+Label playerOneDisplay;
+Label playerTwoDisplay;
 CheckersData board;  // The data for the checkers board is kept here This board is also responsible for generating lists of legal moves.
 boolean gameInProgress; // Is a game currently in progress?
 
@@ -70,6 +94,8 @@ boolean gameInProgress; // Is a game currently in progress?
 
 	// the value is valid only when the game is say
 int currentPlayer;      // Whose turn is it now?  The possible values are CheckersData.RED and CheckersData.BLACK.
+String playerOne;
+String playerTwo;
 int selectedRow, selectedCol;  // If the current player has selected a piece to move,
 CheckersMove[] legalMoves;  // current player with legal move 
 
@@ -86,7 +112,11 @@ public CheckersCanvas()
 	 resignButton.addActionListener(this);
 	 newGameButton = new Button("New Game");
 	 newGameButton.addActionListener(this);
+	 rulesButton = new Button("Rules");
+	 rulesButton.addActionListener(this);
 	 message = new Label("",Label.CENTER);
+	 playerOneDisplay = new Label("",Label.CENTER);
+	 playerTwoDisplay = new Label("",Label.CENTER);
 	 board = new CheckersData();
 	 doNewGame();
 	}
@@ -99,9 +129,11 @@ public void actionPerformed(ActionEvent evt)
 	    // Respond to user's click on one of the two buttons.
 	 Object src = evt.getSource();
 	 if (src == newGameButton)
-	    doNewGame();
+		 doNewGame();
 	 else if (src == resignButton)
-	    doResign();
+		 doResign();
+	 else if (src == rulesButton)
+		 doRules();
 	}
 
 
@@ -114,19 +146,64 @@ void doNewGame()
 		    message.setText("Finish the current game first!");
 		    return;
 		 }
+		 doGetNames();
 		 board.setUpGame();   // Set up the pieces.
 		 currentPlayer = CheckersData.RED;   // RED moves first.
 		 legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 		 selectedRow = -1;   // RED has not yet selected a piece to move.
-		 message.setText("Red:  Make your move.");
+		 message.setText(playerOne + ":  Make your move.");
+		 playerOneDisplay.setText(playerOne);
+		 playerTwoDisplay.setText(playerTwo);
 		 gameInProgress = true;
 		 newGameButton.setEnabled(false);
 		 resignButton.setEnabled(true);
+		 rulesButton.setEnabled(true);
 		 repaint();
 	}
 
+void doGetNames()
+	{
+		doGetPlayerOne();
+		doGetPlayerTwo();
+	}
 
+void doGetPlayerOne()
+	{
+		playerOne = (String)JOptionPane.showInputDialog(
+            null,							//Default Center
+            "Player One's Name: \n",		//Body Message
+            "Player One",					//Title Message
+            JOptionPane.PLAIN_MESSAGE,
+            null,							//Icon
+            null,							//Options. null = fill in
+            "Player One");					//Default Message
+		if ((playerOne == null) || (playerOne.length() == 0)) {
+			JOptionPane.showMessageDialog(null,
+				    "Player One's name was not entered.",
+				    "Error",
+				    JOptionPane.ERROR_MESSAGE);
+			doGetPlayerOne();
+		}
+	}
 
+void doGetPlayerTwo()
+	{
+		playerTwo = (String)JOptionPane.showInputDialog(
+            null,							//Default Center
+            "Player Two's Name: \n",		//Body Message
+            "Player Two",					//Title Message
+            JOptionPane.PLAIN_MESSAGE,
+            null,							//Icon
+            null,							//Options. null = fill in
+            "Player Two");					//Default Message
+		if ((playerTwo == null) || (playerTwo.length() == 0)) {
+			JOptionPane.showMessageDialog(null,
+				    "Player Two's name was not entered.",
+				    "Error",
+				    JOptionPane.ERROR_MESSAGE);
+			doGetPlayerTwo();
+		}
+	}
 
 void doResign() 
 	{
@@ -136,12 +213,52 @@ void doResign()
 	     return;
 	  }
 	  if (currentPlayer == CheckersData.RED)
-	     gameOver("RED resigns. BLACK wins.");
+	     gameOver(playerOne + " resigns. " + playerTwo + " wins.");
 	  else
-	     gameOver("BLACK resigns. RED winds.");
+	     gameOver(playerTwo + " resigns. " + playerOne + " wins.");
 	}
 
-
+void doRules()
+	{
+		JOptionPane.showMessageDialog(null, 				//Defaults to screen center
+				"Movement:\n"									//Body Messages, \t for tab doesn't work well in joptionpane
+				+ "1) Players take turns moving to advance one of their game pieces. \n"							
+				+ "  i)   The player who has the red pieces moves first \n"
+				+ "  ii)  Only one piece may be moved per turn. \n"
+				+ "  iii) Game pieces can only be moved diagonally into an adjacent unoccupied space. \n"
+				+ "   a) No player can move their game piece outside the bounds of the board. \n"
+				+ "   b) Players may only advance their game piece toward their opponent's side of the board "
+				+ "(in the FORWARD direction) unless the game piece is a KING piece. \n"
+				+ "   c) A player may advance their game piece 2 spaces if an adjacent space is occupied by one of their "
+				+ "opponent's game pieces AND there is an empty space immediately behind their opponent's piece in a "
+				+ "straight line. \n       The player JUMPS over their opponent's game piece; the JUMPED piece is considered "
+				+ "CAPTURED and is removed from the board. \n"
+				+ "   d) CAPTURED pieces are removed from the board.\n"
+				+ "   e) A player may make succesive JUMPS in a single turn if the pace that the piece moves to has a LEGAL JUMP. \n"
+				+ "   f) Players must JUMP if a jump is available. \n"
+				+ "     i)  This includes successive jumps. \n"
+				+ "     ii) If multiple JUMP moves are available, the player may choose between them. \n"
+				+ "   g) If a piece enters the opponent's KING'S ROW, that piece becomes a KING for the "
+				+ "rest of the game (unless it is CAPTURED). \n"
+				+ "     i) KINGS should be differentiable in some way, such as a sumbol of a crown or a "
+				+ "captured piece placed on top. \n"
+				+ "   h) KING pieces are allowed to move FORWARD or BACKWARD but still only along diagonals and into unoccupied game "
+				+ "spaces. Standard JUMP rules also apply. \n"
+				+ "\n"
+				+ "Winning Condition: \n"
+				+ "1) The game is over when a player has no more legal moves or no more pieces on the board. \n"
+				+ "  i)  If a player has no legal moves, the player with the most remaining pieces on the board wins (game declared a draw "
+				+ "if players have an equal number of pieces on the board). \n"
+				+ "  ii) If a player has no more pieces on the board, the other player wins. \n"
+				+ "2) A player chooses to forfeit during their turn. \n"
+				+ "  i) If a player chooses to forfeit during their turn, the other player wins. \n"
+				+ "3) If no game piece has been removed from the board in 10 turns, \n"
+				+ "  i)  The player with the most game pieces remaining wins. \n"
+				+ "  ii) If players have the same number of pieces then the game is declared a draw. \n"
+				+ "", 			
+				"The Rules of Checkers", 					//Title message
+				JOptionPane.INFORMATION_MESSAGE);
+	}
 
 
 void gameOver(String str) 
@@ -150,6 +267,7 @@ void gameOver(String str)
 	 message.setText(str);
 	 newGameButton.setEnabled(true);
 	 resignButton.setEnabled(false);
+	 rulesButton.setEnabled(true);
 	 gameInProgress = false;
 	}
  
@@ -161,9 +279,9 @@ void doClickSquare(int row, int col)
 		       selectedRow = row;
 		       selectedCol = col;
 		       if (currentPlayer == CheckersData.RED)
-		          message.setText("RED:  Make your move.");
+		          message.setText(playerOne + ":  Make your move.");
 		       else
-		          message.setText("BLACK:  Make your move.");
+		          message.setText(playerTwo + ":  Make your move.");
 		       repaint();
 		       return;
 		    }
@@ -197,9 +315,9 @@ void doMakeMove(CheckersMove move)
 		    legalMoves = board.getLegalJumpsFrom(currentPlayer,move.toRow,move.toCol);
 		    if (legalMoves != null) {
 		       if (currentPlayer == CheckersData.RED)
-		          message.setText("RED:  You must continue jumping.");
+		          message.setText(playerOne + ":  You must continue jumping.");
 		       else
-		          message.setText("BLACK:  You must continue jumping.");
+		          message.setText(playerTwo + ":  You must continue jumping.");
 		       selectedRow = move.toRow;  
 		       selectedCol = move.toCol;
 		       repaint();
@@ -212,21 +330,21 @@ void doMakeMove(CheckersMove move)
 		    currentPlayer = CheckersData.BLACK;
 		    legalMoves = board.getLegalMoves(currentPlayer);
 		    if (legalMoves == null)
-		       gameOver("BLACK has no moves.  RED wins.");
+		       gameOver(playerTwo + " has no moves. " + playerOne + " wins.");
 		    else if (legalMoves[0].isJump())
-		       message.setText("BLACK:  Make your move.  You must jump.");
+		       message.setText(playerTwo + ":  Make your move.  You must jump.");
 		    else
-		       message.setText("BLACK:  Make your move.");
+		       message.setText(playerTwo + ":  Make your move.");
 		 }
 		 else {
 		    currentPlayer = CheckersData.RED;
 		    legalMoves = board.getLegalMoves(currentPlayer);
 		    if (legalMoves == null)
-		       gameOver("RED has no moves.  BLACK wins.");
+		       gameOver(playerOne + " has no moves. " + playerTwo + " wins.");
 		    else if (legalMoves[0].isJump())
-		       message.setText("RED:  Make your move.  You must jump.");
+		       message.setText(playerOne + ":  Make your move.  You must jump.");
 		    else
-		       message.setText("RED:  Make your move.");
+		       message.setText(playerOne + ":  Make your move.");
 		 }
 		 
 		 // Set selectedRow = -1 to record that the player has not yet selected a piece to move. 
